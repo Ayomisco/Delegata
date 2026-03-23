@@ -245,4 +245,53 @@ IMPORTANT RULES:
   console.log('='.repeat(60) + '\n')
 }
 
-runDelegataAgent().catch(console.error)
+// HTTP server — keeps container alive, exposes agent via API
+import http from 'http'
+
+const PORT = process.env.PORT || 3001
+
+const server = http.createServer(async (req, res) => {
+  res.setHeader('Content-Type', 'application/json')
+  res.setHeader('Access-Control-Allow-Origin', '*')
+
+  if (req.method === 'GET' && req.url === '/health') {
+    res.writeHead(200)
+    res.end(JSON.stringify({ status: 'ok', agent: 'Delegata', model: 'gemini-2.0-flash' }))
+    return
+  }
+
+  if (req.method === 'POST' && req.url === '/run') {
+    try {
+      await runDelegataAgent()
+      res.writeHead(200)
+      res.end(JSON.stringify({ success: true, message: 'Agent demo completed' }))
+    } catch (err: any) {
+      res.writeHead(500)
+      res.end(JSON.stringify({ success: false, error: err.message }))
+    }
+    return
+  }
+
+  if (req.method === 'GET' && req.url === '/') {
+    res.writeHead(200)
+    res.end(JSON.stringify({
+      name: 'Delegata Agent',
+      description: 'OAuth for AI agents — ERC-7715 delegation enforcement',
+      endpoints: {
+        'GET /health': 'Health check',
+        'POST /run': 'Run delegation demo',
+        'GET /': 'This info page',
+      }
+    }))
+    return
+  }
+
+  res.writeHead(404)
+  res.end(JSON.stringify({ error: 'Not found' }))
+})
+
+server.listen(PORT, () => {
+  console.log(`\nDelegata Agent running on port ${PORT}`)
+  console.log(`Health: http://localhost:${PORT}/health`)
+  console.log(`Run demo: POST http://localhost:${PORT}/run\n`)
+})
