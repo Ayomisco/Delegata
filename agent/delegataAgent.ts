@@ -9,7 +9,7 @@ const tools = [
     name: 'validate_delegation',
     description:
       'Validate a delegation from the DelegationManager contract. Check if caveats are satisfied.',
-    inputSchema: {
+    parameters: {
       type: 'object',
       properties: {
         delegationId: {
@@ -32,7 +32,7 @@ const tools = [
     name: 'execute_permitted_swap',
     description:
       'Execute a Uniswap swap within the bounds of a validated delegation.',
-    inputSchema: {
+    parameters: {
       type: 'object',
       properties: {
         delegationId: {
@@ -64,7 +64,7 @@ const tools = [
     name: 'create_sub_delegation',
     description:
       'Create a sub-delegation with reduced permissions. Agent can delegate a subset of its own delegation to another agent.',
-    inputSchema: {
+    parameters: {
       type: 'object',
       properties: {
         parentDelegationId: {
@@ -90,7 +90,7 @@ const tools = [
   {
     name: 'get_delegation_status',
     description: 'Get full status of all active delegations for a wallet address.',
-    inputSchema: {
+    parameters: {
       type: 'object',
       properties: {
         walletAddress: {
