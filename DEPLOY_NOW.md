@@ -58,11 +58,11 @@ vercel --prod
 4. Add service: Select folder `agent/`
 5. Add environment variables:
    ```
-   GOOGLE_API_KEY=AIzaSyBOJxyZVSWpkyDoJ_6DbS3-SYeL9gfODSY
-   SYNTHESIS_API_KEY=sk-synth-782a63a2c1bb823e80e1830cea3743a1f5f2c3cd8617dedc
-   SYNTHESIS_TEAM_ID=05485d35305545b9aab867946aa1c5ae
-   SYNTHESIS_PARTICIPANT_ID=b2110b4f99d44831af6fabc8d9c8a28e
-   AGENT_PRIVATE_KEY=0x3d7af466e369caae29aee05100731c8800ddd3ab10ddaa5d2f03a1b06aab7273
+   GOOGLE_API_KEY=<your_google_api_key>
+   SYNTHESIS_API_KEY=<your_synthesis_api_key>
+   SYNTHESIS_TEAM_ID=<your_team_id>
+   SYNTHESIS_PARTICIPANT_ID=<your_participant_id>
+   AGENT_PRIVATE_KEY=<your_new_agent_private_key>
    BASE_MAINNET_RPC_URL=https://mainnet.base.org
    ```
 6. Click: "Deploy" (auto-detects Dockerfile)
