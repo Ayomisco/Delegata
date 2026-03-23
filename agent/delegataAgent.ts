@@ -1,17 +1,15 @@
-import Anthropic from '@anthropic-ai/sdk'
+import { GoogleGenerativeAI } from '@google/generative-ai'
 import 'dotenv/config'
 
-const client = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY,
-})
+const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY)
 
-// Tool definitions for Claude
-const tools: Anthropic.Tool[] = [
+// Tool definitions for Gemini
+const tools = [
   {
     name: 'validate_delegation',
     description:
       'Validate a delegation from the DelegationManager contract. Check if caveats are satisfied.',
-    input_schema: {
+    inputSchema: {
       type: 'object',
       properties: {
         delegationId: {
@@ -34,7 +32,7 @@ const tools: Anthropic.Tool[] = [
     name: 'execute_permitted_swap',
     description:
       'Execute a Uniswap swap within the bounds of a validated delegation.',
-    input_schema: {
+    inputSchema: {
       type: 'object',
       properties: {
         delegationId: {
@@ -66,7 +64,7 @@ const tools: Anthropic.Tool[] = [
     name: 'create_sub_delegation',
     description:
       'Create a sub-delegation with reduced permissions. Agent can delegate a subset of its own delegation to another agent.',
-    input_schema: {
+    inputSchema: {
       type: 'object',
       properties: {
         parentDelegationId: {
@@ -92,7 +90,7 @@ const tools: Anthropic.Tool[] = [
   {
     name: 'get_delegation_status',
     description: 'Get full status of all active delegations for a wallet address.',
-    input_schema: {
+    inputSchema: {
       type: 'object',
       properties: {
         walletAddress: {
@@ -176,7 +174,7 @@ function executeTool(toolName: string, toolInput: Record<string, string | number
 
 async function runDelegataAgent() {
   console.log('\n' + '='.repeat(60))
-  console.log('DELEGATA — AI Agent Demo (Claude + ERC-7715)')
+  console.log('DELEGATA — AI Agent Demo (Gemini + ERC-7715)')
   console.log('='.repeat(60))
 
   const userMessage = `
@@ -195,63 +193,51 @@ IMPORTANT RULES:
 - If delegation is invalid, refuse the action and explain why
 `
 
-  const messages: Anthropic.MessageParam[] = [
-    {
-      role: 'user',
-      content: userMessage,
-    },
-  ]
-
-  let response = await client.messages.create({
-    model: 'claude-3-5-haiku-20241022',
-    max_tokens: 1024,
-    tools: tools,
-    messages: messages,
+  const model = genAI.getGenerativeModel({
+    model: 'gemini-1.5-flash',
+    tools: [{ functionDeclarations: tools as any }],
   })
 
-  console.log('\n[Claude Thinking...]')
+  const chat = model.startChat({
+    generationConfig: {
+      temperature: 0.7,
+      maxOutputTokens: 1024,
+    },
+  })
+
+  let response = await chat.sendMessage(userMessage)
+  console.log('\n[Gemini Thinking...]')
 
   // Agentic loop - handle tool calls
-  while (response.stop_reason === 'tool_use') {
-    const toolUse = response.content.find((block): block is Anthropic.ToolUseBlock => block.type === 'tool_use')
+  while (response.response.candidates?.[0]?.content?.parts?.some((p: any) => p.functionCall)) {
+    const functionCall = response.response.candidates?.[0]?.content?.parts?.find((p: any) => p.functionCall)
+      ?.functionCall
 
-    if (!toolUse) break
+    if (!functionCall) break
 
-    const toolResult = executeTool(toolUse.name, toolUse.input as Record<string, string | number>)
+    const toolResult = executeTool(functionCall.name, functionCall.args as Record<string, string | number>)
     console.log(`[Tool Result]: ${toolResult}`)
 
-    // Add assistant response and tool result to messages
-    messages.push({
-      role: 'assistant',
-      content: response.content,
-    })
-
-    messages.push({
-      role: 'user',
-      content: [
-        {
-          type: 'tool_result',
-          tool_use_id: toolUse.id,
-          content: toolResult,
+    // Continue conversation with tool result
+    response = await chat.sendMessage([
+      {
+        functionResult: {
+          name: functionCall.name,
+          response: JSON.parse(toolResult),
         },
-      ],
-    })
-
-    // Continue conversation
-    response = await client.messages.create({
-      model: 'claude-3-5-haiku-20241022',
-      max_tokens: 1024,
-      tools: tools,
-      messages: messages,
-    })
+      } as any,
+    ])
   }
 
   // Extract final text response
-  const finalResponse = response.content.find((block): block is Anthropic.TextBlock => block.type === 'text')
+  const finalText = response.response.candidates?.[0]?.content?.parts
+    ?.filter((p: any) => p.text)
+    ?.map((p: any) => p.text)
+    ?.join('')
 
-  if (finalResponse) {
+  if (finalText) {
     console.log('\n[Delegata Response]:')
-    console.log(finalResponse.text)
+    console.log(finalText)
   }
 
   console.log('\n' + '='.repeat(60))

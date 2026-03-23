@@ -2,15 +2,15 @@
   "name": "delegata-agent",
   "version": "0.1.0",
   "private": true,
-  "main": "dist/agent.js",
+  "main": "dist/delegataAgent.js",
   "scripts": {
-    "dev": "ts-node agent.ts",
+    "dev": "ts-node delegataAgent.ts",
     "build": "tsc",
-    "start": "node dist/agent.js",
+    "start": "node dist/delegataAgent.js",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.24.0",
+    "@google/generative-ai": "^0.15.0",
     "dotenv": "^16.4.0"
   },
   "devDependencies": {

@@ -1,10 +1,45 @@
 {
+  "$schema": "https://railway.app/railway.schema.json",
   "build": {
-    "builder": "nixpacks"
+    "builder": "dockerfile",
+    "dockerfile": "./agent/Dockerfile"
   },
   "deploy": {
-    "startCommand": "cd agent && npm install && node agent.js",
-    "restartPolicyType": "always",
-    "restartPolicyMaxRetries": 10
+    "startCommand": "npm start",
+    "restartPolicyMaxRetries": 3,
+    "restartPolicyWindowSeconds": 60,
+    "healthchecks": {
+      "cpu": {
+        "percentage": 80
+      },
+      "memory": {
+        "percentage": 80
+      }
+    }
+  },
+  "variables": {
+    "GOOGLE_API_KEY": {
+      "description": "Google Generative AI API Key"
+    },
+    "SYNTHESIS_API_KEY": {
+      "description": "Synthesis Hack API Key"
+    },
+    "SYNTHESIS_TEAM_ID": {
+      "description": "Synthesis Hack Team ID"
+    },
+    "SYNTHESIS_PARTICIPANT_ID": {
+      "description": "Synthesis Hack Participant ID"
+    },
+    "AGENT_PRIVATE_KEY": {
+      "description": "Agent wallet private key for signing transactions"
+    },
+    "BASE_MAINNET_RPC_URL": {
+      "description": "Base Mainnet RPC endpoint",
+      "default": "https://mainnet.base.org"
+    },
+    "PORT": {
+      "description": "Server port",
+      "default": "3001"
+    }
   }
 }
