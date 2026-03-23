@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { ConnectButton } from '@rainbow-me/rainbowkit'
-import { useAccount, useWalletClient, usePublicClient } from 'wagmi'
+import { useAccount, useWalletClient } from 'wagmi'
 import { isAddress } from 'viem'
 import { baseSepolia } from 'wagmi/chains'
 import { createDelegation } from '@/lib/delegation'
@@ -10,7 +10,6 @@ import { createDelegation } from '@/lib/delegation'
 export default function Home() {
   const { address, isConnected } = useAccount()
   const { data: walletClient } = useWalletClient()
-  const publicClient = usePublicClient()
 
   const [form, setForm] = useState({
     agentAddress: '',
