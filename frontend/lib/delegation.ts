@@ -59,17 +59,17 @@ export async function createDelegation(params: CreateDelegationParams): Promise<
       {
         enforcer: ERC20_TRANSFER_AMOUNT_ENFORCER,
         terms: encodeDailyCapCaveat(tokenAddress, dailyCapAmount),
-        args: '0x',
+        args: '0x' as `0x${string}`,
       },
       {
         enforcer: TIMESTAMP_ENFORCER,
         terms: encodeTimestampCaveat(expiryTimestamp),
-        args: '0x',
+        args: '0x' as `0x${string}`,
       },
       {
         enforcer: ALLOWED_TARGETS_ENFORCER,
         terms: encodeAllowedTargetsCaveat([UNISWAP_ROUTER_BASE_SEPOLIA]),
-        args: '0x',
+        args: '0x' as `0x${string}`,
       },
     ],
     salt: BigInt(Date.now()),
