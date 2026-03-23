@@ -8,7 +8,7 @@ import '@rainbow-me/rainbowkit/styles.css'
 
 const config = getDefaultConfig({
   appName: 'Delegata',
-  projectId: 'delegata-synthesis-2026',
+  projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || '0d0f98e22bb6ae49f794823c886e5fee',
   chains: [baseSepolia, base],
   ssr: true,
 })

@@ -1,4 +1,4 @@
-import { WalletClient, Address, parseUnits } from 'viem'
+import { WalletClient, Address } from 'viem'
 import { baseSepolia } from 'viem/chains'
 
 // Token addresses on Base Sepolia
