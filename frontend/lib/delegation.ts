@@ -54,7 +54,7 @@ export async function createDelegation(params: CreateDelegationParams): Promise<
   const delegation = {
     delegate: delegatee,
     delegator: delegator,
-    authority: '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff',
+    authority: '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff' as `0x${string}`,
     caveats: [
       {
         enforcer: ERC20_TRANSFER_AMOUNT_ENFORCER,
